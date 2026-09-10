@@ -1,0 +1,32 @@
+function fillAndSubmit(data) {
+    // 1. 数据解构与处理 (自动清理所有空格)
+    let [card, mm, yy] = data.replace(/\s/g, '').split('|');
+    if (!yy) return console.error("格式错误！需为: Card|MM|YY");
+
+    let yy4 = yy.length === 2 ? '20' + yy : yy;
+    let yy2 = yy4.slice(-2);
+
+    // 2. 字段映射表 (id: 填入的值)
+    let fields = {
+        'ccNumber_disp': card,   'ccExpirationMonth': mm, 'ccExpirationYear_disp': yy2, // 显示框
+        'ccNumber': card,        'ccExpirationYear': yy4,                               // 隐藏框
+        'billingFirstName': 'Shourinn', 'billingLastName': 'Bunnshi'                    // 姓名
+    };
+
+    // 3. 批量赋值与事件触发
+    for (let id in fields) {
+        let el = document.getElementById(id);
+        if (el) {
+            el.value = fields[id];
+            // 批量触发状态同步事件
+            ['input', 'change', 'blur'].forEach(ev => el.dispatchEvent(new Event(ev, { bubbles: true })));
+            el.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'Enter' }));
+        }
+    }
+
+    // 4. 延时 0.5 秒强制交单
+    setTimeout(() => document.forms[0]?.submit(), 500);
+}
+
+// 执行
+fillAndSubmit("1234567812345678|12|2027");
